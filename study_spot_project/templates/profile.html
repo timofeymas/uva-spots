@@ -1,0 +1,118 @@
+{% comment %} https://www.bootdey.com/snippets/view/profile-with-data-and-skills {% endcomment %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'default.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'profile.css' %}">
+    <title>{{profile_user.username}} Profile</title>
+    <style>
+        body{
+            background-color: #bbe2c6;
+        }
+    </style>
+</head>
+
+{% include 'callable/nav_bar.html' %}
+{% include 'callable/messages.html' %}
+
+<div class="container" style="background-color: #bbe2c6;">
+    <div class="main-body">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <div class="mt-3">
+                                <h4>Username: {{profile_user.username}}</h4>
+                                <p class="text-secondary mb-1">Email: {{profile_user.email}}</p> <br>
+                                <p class="text-muted font-size-sm">First Name: {{profile_user.first_name}}</p>
+                                <p class="text-muted font-size-sm">Last Name: {{profile_user.last_name}}</p>
+                                <p>In the Group: {% if is_profile_admin %} Admin {% else %} Regular User</p> {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                    <div class="card mb-3">
+                        {%if reject_unaccepted_places or wait_unaccepted_places%}
+                        <div class="card-header">
+                            <h5 class="card-title text-center">Pending Study Spots</h5>
+                        </div>
+                        <div class="card-body">
+                            {%if reject_unaccepted_places%}
+                                {% for place in reject_unaccepted_places %}
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                                <h6 class="mb-0">{{ place.name }}</h6>
+                                        </div>
+                                        <div class="col-sm-9 text-secondary">
+                                            Rejected for: {{place.rejection_message}}
+                                        </div>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            {% endif %}
+
+                            {%if wait_unaccepted_places%}
+                            {% for place in wait_unaccepted_places %}
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        {%if is_admin%}
+                                        <a href="{% url 'place_details' place_name_slug=place.name_slug %}">
+                                            <h6 class="mb-0">{{ place.name }}</h6>
+                                        </a> 
+                                        {%else%}
+                                            <h6 class="mb-0">{{ place.name }}</h6>
+                                        {%endif%}
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        This Study Spot is pending approval.
+                                    </div>
+                                </div>
+                                <hr>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {%endif%}
+                    </div>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title text-center">Reviews</h5>
+                    </div>
+                    <div class="card-body">
+                        {%if reviews%}
+                        {% for review in reviews %}
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <a href="{% url 'place_details' place_name_slug=review.place.name_slug %}">
+                                        <h6 class="mb-0">{{ review.place.name }}</h6>
+                                    </a>                    
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    Description: {{review.rating_text}}
+                                </div>
+                            </div>
+                            <hr>
+                        {% endfor %}
+                        {%else%}
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <h5>No reviews.</h5>
+                                </div>
+                            </div>
+                        {% endif%}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

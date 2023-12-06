@@ -1,0 +1,8 @@
+.offcanvas-footer{
+    padding: 1rem 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.offcanvas-size-md {
+    --bs-offcanvas-width: min(95vw, 320px) !important;
+}

@@ -1,0 +1,113 @@
+{% if request.user.is_authenticated%}
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <title>Add a Study Spot</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'default.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="{% static 'add_map.js' %}"></script>  
+    </head>
+
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+        <ul class="navbar-nav" style="flex-direction: row;">
+            <a class="navbar-brand" href="{% url 'home' %}" style="margin-right: 50px;">Home</a>
+            <a class="nav-link m2" href="{% url 'map' %}" style="color: white;">Map</a>
+        </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end offcanvas-size-md text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                <div class="offcanvas-header">
+                    <a href="{% url 'profile' user_id=user.id %}" class = "offcanvas-title h5" id="offcanvasDarkNavbarLabel"> {{ user.username }} </a>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Map</a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{% url 'map' %}" style="color: white;">Study Spots</a></li>
+                            <li><a class="dropdown-item" href="{% url 'add' %}" style="color: white;">Add Study Spot  </a></li>
+                            </ul>
+                        </li>
+                        {% if is_admin %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'staff' %}" style="color: white;">Staff</a>
+                                </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="offcanvas-footer">
+                    <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}" style="color: white;">Logout</a>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <body style="padding-top: 56px; background-color: #92bda3;">
+
+        <main role="main" class="container">
+            <div class="my-3 p-3 bg-white rounded box-shadow">
+                {% if object%}
+                    <h1 class="mb-4">Update {{object.name}}</h1>
+                {% else %}
+                    <h1 class="mb-4">Add a Study Spot</h1>
+                {% endif %}
+                <h6 class="border-bottom border-gray pb-2 mb-0">Find your study spot on the map, then click to drop a pin. Your study spot will not be displayed until Admin approved.</h6>
+                <div class="container" style="background-color: #bbe2c6;">
+                    <div class="row">
+                        <div class="col-md-8" style = "padding-top: 8px;">
+                            <div class="media text-muted pt-3"id="map" style="height: 400px"></div>
+                        </div>
+                        <div class="col justify-content-center" style = "padding-top: 8px;">
+                            <form method="post" novalidate>
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <div class="text-center mt-4">
+                                    {% if object %}
+                                        <button type="submit" class="btn btn-success">Update</button>
+                                        <a href="{% url 'place_details' object.name_slug %}" class="btn btn-danger">Cancel</a>
+                                    {% else %}  
+                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <a href="{% url 'map' %}" class="btn btn-danger">Cancel</a>    
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </div>
+                      </div>
+                  </div>
+            </div>
+        </main>
+        
+    <script src="https://maps.googleapis.com/maps/api/js?key="></script>
+    <script src="../static/add_map.js"></script>
+</body>
+    
+{% else %}
+    <link rel="stylesheet" type="text/css" href="{% static 'forbidden.css' %}">
+        <script>
+        document.addEventListener("click", function() {
+            window.location.href = "{% url 'logout' %}";
+        });
+    </script>
+    <div id="app">
+        <div>403</div>
+        <div class="txt">
+            Forbidden
+            <span class="blink">_</span>
+        </div>
+    </div>
+{% endif %}

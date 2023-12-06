@@ -1,0 +1,50 @@
+{% comment %} https://getbootstrap.com/docs/5.0/components/navbar/ {% endcomment %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <ul class="navbar-nav" style="flex-direction: row;">
+          <a class="navbar-brand" href="{% url 'home' %}" style="margin-right: 50px;">Home</a>
+          <a class="nav-link m2" href="{% url 'map' %}" style="color: white;">Map</a>
+      </ul>
+      {% if request.user.is_authenticated%}
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end offcanvas-size-md text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+          <div class="offcanvas-header">
+            <a href="{% url 'profile' user_id=user.id %}" class = "offcanvas-title h5" id="offcanvasDarkNavbarLabel"> {{ user.username }} </a>
+            {% comment %} <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">{{user.username}}</h5> {% endcomment %}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Map</a>
+                <ul class="dropdown-menu dropdown-menu-dark">
+                  <li><a class="dropdown-item" href="{% url 'map' %}" style="color: white;">Study Spots</a></li>
+                  <li><a class="dropdown-item" href="{% url 'add' %}" style="color: white;">Add Study Spot  </a></li>
+                </ul>
+              </li>
+              {% if is_admin %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'staff' %}" style="color: white;">Staff</a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="offcanvas-footer">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout' %}" style="color: white;">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      {% else %}
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href='/accounts/login' style="color: white;">Login</a>
+          </li>
+        </ul>
+      {% endif %}
+    </div>
+  </nav>

@@ -1,0 +1,58 @@
+<body style="background-color: #bbe2c6 !important;">
+    <div class="d-flex align-items-center justify-content-center vh-80">
+        <div class="shadow p-4 center" style = "background-color: #92bda3; width: 60%; margin-top: 110px;">
+            <h1> {{ place.name }} Details: </h1>
+            <p>Rating: {{ place.average_rating }}</p>
+            <p>Noise Level Rating: {{ place.average_noise }}</p>
+            <p>Personal Space Rating: {{ place.average_space}}</p>
+            <p>Available Seating Rating: {{ place.average_open_seats }}</p>
+            <p>Description: {{ place.place_description }} </p>
+
+
+            {% if not request.user.is_authenticated %}
+                <p style="text-align: center; padding: 10px;">
+                    <a href='/accounts/login' class="btn btn-success" role="button">
+                        Login to write a review!
+                    </a>
+                </p>
+            {% endif %}
+
+            {% if review_form %}
+                {% include 'callable/review_form.html' %}
+            {% endif %}
+
+            <p></p>
+            <p></p>
+                    
+            <div class="text-center">
+            {% if is_admin %}
+                <a href = "{% url 'update_place' place_name_slug%}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i>
+                    Update Place
+                </a>
+                <a href = "{% url 'remove_place' place_name_slug%}" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                    Remove Place
+                </a>
+            {% endif %}
+                
+            </div>
+
+            {% if not is_admin %}
+            <p style="text-align: center; padding: 10px;">
+                <a href="{% url 'map' %}" class="btn btn-dark" role="button">
+                    Back to Map
+                </a>
+            </p>
+
+            {% else %}
+            <p style="text-align: center; padding: 10px;">
+                <a href="{% url 'admin_map' %}" class="btn btn-dark" role="button">
+                    Back to Map
+                </a>
+            </p>  
+
+            {% endif %}
+        </div>
+    </div>
+</body>

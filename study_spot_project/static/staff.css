@@ -1,0 +1,40 @@
+.centered-container h1 {
+    font-size: 100px;
+    background-color: #3f8ecb;
+}
+
+.centered-container p {
+    font-size: 30px;
+    background-color: #3f8ecb;
+}
+
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height:100vh;
+}
+
+.main {
+    padding-top: 30px;
+    
+}
+
+.unaccepted-places {
+    padding-top: 20px;
+    
+}
+
+.users {
+    margin-top: 40px;
+}
+
+.scroll {
+    /*https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y*/
+    width: 60%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}

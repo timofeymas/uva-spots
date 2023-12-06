@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<!--
+ @license
+ Copyright 2019 Google LLC. All Rights Reserved.
+ SPDX-License-Identifier: Apache-2.0
+-->
+<html>
+  <head>
+    <title>Study Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="{% static 'map.js' %}"></script>    
+    <link rel="stylesheet" type="text/css" href="{% static 'map.css' %}">
+  </head>
+  {% include 'callable/messages.html' %}
+  <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <ul class="navbar-nav" style="flex-direction: row;">
+            <a class="navbar-brand" href="{% url 'home' %}" style="margin-right: 50px;">Home</a>
+            {% if request.user.is_authenticated%}
+            <a class="nav-link m2" href="{% url 'add' %}" style="color: white; margin-right: 50px;">Add a Study Spot</a>
+            {% endif%}
+            <button class="btn btn-dark" type="button" onclick="toggleColumn()"> Filter </button>
+        </ul>
+        {% if request.user.is_authenticated%}
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="offcanvas offcanvas-end offcanvas-size-md text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+            <div class="offcanvas-header">
+              <a href="{% url 'profile' user_id=user.id %}" class = "offcanvas-title h5" id="offcanvasDarkNavbarLabel"> {{ user.username }} </a>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">Map</a>
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li><a class="dropdown-item" href="{% url 'map' %}" style="color: white;">Study Spots</a></li>
+                    <li><a class="dropdown-item" href="{% url 'add' %}" style="color: white;">Add Study Spot  </a></li>
+                  </ul>
+                </li>
+                {% if is_admin %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'staff' %}" style="color: white;">Staff</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="offcanvas-footer">
+              <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'logout' %}" style="color: white;">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        {% else %}
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href='/accounts/login' style="color: white;">Login</a>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+  </nav>
+  <body>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        $('.card-title1').click(function() {
+          $('form').toggle();
+    
+          if ($('form').is(':visible')) {
+            document.documentElement.style.setProperty('--div-height', '360px');
+          } else {
+            document.documentElement.style.setProperty('--div-height', '580px');
+          }
+        });
+      });
+    </script>
+  
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-4" id="studySpotColumn" style="overflow-y: auto; display: none; background-color: #bbe2c6;">
+
+          <a style="text-decoration: none;">
+            <div class="card-header" style="margin-top: 10px;
+                                            margin-bottom: 10px;
+                                            margin-left: 0;
+                                            margin-right: 0;
+                                            background-color: #92bda3;
+                                            color: black;
+                                            text-align: center;
+                                            cursor: pointer">
+                <h5 class="card-title1">Filter Study Spots ▾</h5>
+            </div>
+        </a>
+          <form method="GET">
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-md-13 text-left">
+                  {% load widget_tweaks %}
+                  
+                  {% for filter in filter.form %}
+                  <div class="filter">
+
+                    {{ filter.label_tag }}
+
+
+                      {% render_field filter %}
+
+                  </div>
+                  {% endfor %}
+                  <div class = 'text-center'>
+                  <button type="submit" class="btn btn-primary">Apply Filter</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+
+
+          <div class="card-header" style = "margin-top: 10px;
+                                            margin-bottom: 10px;
+                                            margin-left: 0;
+                                            margin-right: 0;
+                                            background-color: #92bda3;
+                                            color: black;
+                                            text-align: center;
+                                            cursor: pointer">
+            <h5 class="card-title text-center">Study Spots:</h5>
+          </div>
+
+          <div class="scrollable-content">
+          <ul class="list-group list-group-flush">
+            {% for place in filter.qs %}
+                <li class="list-group-item">
+                    <h6 class="mb-3"><strong>Study Spot:</strong> <a href="{% url 'place_details' place.name_slug %}">{{ place.name }}</a></h6>
+                    <p><strong>Rating Text:</strong> {{ place.place_description }}</p>
+                    <p><strong>Rating:</strong> {{ place.average_rating }}</p>
+                </li>
+            {% endfor %}
+          </ul>
+        </div>
+        </div>
+        <div class="col-md-12" id="mapColumn">
+          <div id="map"></div>
+          <script>var places = [{% for place in filter.qs %}{name: "{{ place.name }}", long: "{{ place.long }}", lat: "{{ place.lat }}", place_description: "{{ place.place_description}}", name_slug: "{{ place.name_slug }}"},{% endfor %}];</script>
+          <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&v=weekly"></script>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    var studySpotColumn = document.getElementById('studySpotColumn');
+    var mapColumn = document.getElementById('mapColumn');
+    var isFilterOpen = localStorage.getItem('isFilterOpen') === 'true';
+    if (isFilterOpen) {
+      studySpotColumn.style.display = 'block';
+      mapColumn.classList.remove('col-md-12');
+      mapColumn.classList.add('col-md-8');
+    } else {
+      studySpotColumn.style.display = 'none';
+      mapColumn.classList.remove('col-md-8');
+      mapColumn.classList.add('col-md-12');
+    }
+
+    function toggleColumn() {
+        if (studySpotColumn.style.display === 'none' || studySpotColumn.style.display === '') {
+            studySpotColumn.style.display = 'block';
+            mapColumn.classList.remove('col-md-12');
+            mapColumn.classList.add('col-md-8');
+            localStorage.setItem('isFilterOpen', 'true');
+        } else {
+            studySpotColumn.style.display = 'none';
+            mapColumn.classList.remove('col-md-8');
+            mapColumn.classList.add('col-md-12');
+            localStorage.setItem('isFilterOpen', 'false');
+        }
+    }
+</script>
+
+</html>
